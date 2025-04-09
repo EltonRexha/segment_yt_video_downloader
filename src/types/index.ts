@@ -15,6 +15,12 @@ export interface VideoConfig {
   url: string;
   title?: string;
   segments: Segment[] | 'auto';
+  formatOptions?: {
+    format?: 'mp4' | 'mkv' | 'webm' | 'ts';
+    quality?: 'high' | 'medium' | 'low';
+    forceEncode?: boolean;
+    audioOnly?: boolean;
+  };
 }
 
 /**

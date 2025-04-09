@@ -1,4 +1,14 @@
-import ytdl from 'ytdl-core';
+// Use commonjs require with a more explicit type declaration
+// This bypasses TypeScript's module resolution completely
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const ytdl = require('ytdl-core') as {
+  (url: string, options?: any): NodeJS.ReadableStream;
+  validateURL: (url: string) => boolean;
+  getInfo: (url: string) => Promise<any>;
+  chooseFormat: (formats: any[], options: any) => any;
+  downloadFromInfo: (info: any, options?: any) => NodeJS.ReadableStream;
+};
+
 import fs from 'fs-extra';
 import path from 'path';
 import logger from './logger';

@@ -1,116 +1,96 @@
-# YouTube Video Processor
+# Video Segmentation System
 
-A Node.js application that downloads YouTube videos and segments them based on provided timestamps or automatic chapter detection.
+A system for generating video segments from longer videos, with support for multiple output formats and configurations.
 
 ## Features
 
-- Download videos from YouTube in high quality
-- Segment videos into parts based on timestamps
-- Auto-detect video chapters for segmentation
-- Concurrent processing of multiple videos
-- Progress tracking and recovery from failures
-- Customizable output formats
+- Segment videos by timestamps
+- Multiple output format support (MP4, MKV, WebM, TS)
+- Adjustable quality settings
+- Audio-only extraction
+- Automatic re-encoding fallback for problematic videos
+- Intelligent MOOV atom handling
+- Keyframe-aware segmentation
 
-## Prerequisites
+## Recent Improvements
 
-- Node.js 16 or higher
-- FFmpeg (automatically installed via ffmpeg-static)
+This project has recently improved its video segmentation capabilities to handle problematic MP4 files and ensure segments are playable in various players. The key enhancements include:
 
-## Installation
-
-1. Clone this repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+1. **Multiple Format Support**: Now supports MP4, MKV, WebM, and MPEG-TS formats for optimal compatibility
+2. **Smart Fallback Strategy**: Attempts stream-copying first and falls back to re-encoding if issues occur
+3. **MOOV Atom Optimization**: Ensures the MOOV atom is placed at the beginning of MP4 files for better compatibility
+4. **Quality Control Options**: Configurable quality settings for different use cases
+5. **Two-step Conversion Process**: Uses intermediate formats when needed for problem files
 
 ## Usage
 
-1. Add YouTube video URLs and segment information to `data/videos.json`:
-
-   ```json
-   [
-     {
-       "id": "video1",
-       "url": "https://www.youtube.com/watch?v=VIDEO_ID",
-       "title": "Optional title",
-       "segments": [
-         {
-           "name": "Segment 1",
-           "start": "00:00:00",
-           "end": "00:05:30"
-         },
-         {
-           "name": "Segment 2",
-           "start": "00:07:15",
-           "end": "00:12:45"
-         }
-       ]
-     },
-     {
-       "id": "video2",
-       "url": "https://www.youtube.com/watch?v=ANOTHER_ID",
-       "segments": "auto"
-     }
-   ]
-   ```
-
-2. Run the application:
-
-   ```bash
-   npm start
-   ```
-
-3. Advanced options:
-
-   ```bash
-   # Process with higher concurrency
-   npm start -- --concurrency=4
-
-   # Specify custom output directory
-   npm start -- --output=./my-videos
-
-   # Force reprocessing of already completed videos
-   npm start -- --force
-   ```
-
-## Configuration
-
-The application can be configured through environment variables or a `.env` file:
-
-- `LOG_LEVEL`: Logging level (default: info)
-- `CONCURRENCY`: Number of videos to process in parallel (default: 2)
-- `OUTPUT_DIR`: Directory for processed videos (default: ./output)
-- `TEMP_DIR`: Temporary directory for downloaded videos (default: ./temp)
-
-## Output
-
-For each video, the application creates:
-
-1. A directory named after the video ID
-2. Segmented video files within that directory
-3. A `summary.json` file with metadata about the segments
-
-## Development
-
-Build the project:
-
-```bash
-npm run build
+```javascript
+const outputPaths = await segmentVideo(
+  'input.mp4',
+  'output-directory',
+  [
+    { name: 'Intro', start: '00:00:00', end: '00:01:30' },
+    { name: 'Main Content', start: '00:01:30', end: '00:10:00' },
+  ],
+  {
+    format: 'ts', // 'mp4', 'mkv', 'webm', or 'ts'
+    quality: 'medium', // 'high', 'medium', or 'low'
+    forceEncode: false, // Force re-encoding instead of stream copy
+    audioOnly: false, // Extract audio only
+  }
+);
 ```
 
-Run in development mode with auto-restart:
+## Format Options
+
+### MP4 Format
+
+- Standard format with wide compatibility
+- May have issues when segmenting at non-keyframe boundaries
+- Uses `-movflags faststart` for better streaming
+
+### MKV Format
+
+- More flexible container that handles a wider variety of codecs
+- Better compatibility with different video sources
+- Good for local playback
+
+### WebM Format
+
+- Optimized for web playback
+- Smaller file sizes for comparable quality
+- Uses VP9 video codec and Opus audio codec
+
+### MPEG-TS Format (Recommended for Segmentation)
+
+- Designed for broadcasting and streaming
+- Most tolerant of segment boundaries
+- Best choice for problematic source files
+
+## Debugging Tools
+
+The project includes a debugging tool to help diagnose issues with video segments:
 
 ```bash
-npm run dev
+node debug/analyze-mp4-segment.js path/to/segment.mp4
 ```
 
-Run tests:
+This tool will analyze the video file and provide detailed information about:
 
-```bash
-npm test
-```
+- File metadata
+- Keyframe placement and spacing
+- MOOV atom presence and position
+- Timestamp continuity
+- Recommendations for fixing issues
 
-## License
+## Documentation
 
-MIT
+For detailed information about video segmentation issues and solutions, see:
+
+- [Video Segmentation Issues](docs/video-segmentation-issues.md)
+- [Format Options Examples](examples/format-options.md)
+
+## Requirements
+
+- Node.js 12+
+- FFmpeg 4.0+

@@ -283,7 +283,12 @@ async function processVideo(
     let segmentPaths: string[];
     try {
       // Process segments
-      segmentPaths = await segmentVideo(videoPath, videoOutputDir, segments);
+      segmentPaths = await segmentVideo(
+        videoPath,
+        videoOutputDir,
+        segments,
+        video.formatOptions
+      );
       logger.debug(`Successfully processed ${segmentPaths.length} segments`);
     } catch (err) {
       // In development mode, rethrow the error for better debugging
