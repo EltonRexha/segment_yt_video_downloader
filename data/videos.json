@@ -1,8 +1,11 @@
 [
   {
-    "id": "23423123",
-    "url": "https://www.youtube.com/watch?v=l01DyPfV10Y",
-    "title": "test video",
-    "segments": "auto"
+    "id": "audio-only-exm",
+    "url": "https://www.youtube.com/watch?v=4OTuIdvg3j8",
+    "title": "Audio-Only Example",
+    "segments": "auto",
+    "formatOptions": {
+      "audioOnly": true
+    }
   }
 ]

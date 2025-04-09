@@ -36,3 +36,5 @@ output/
 .idea/
 *.swp
 *.swo 
+
+data/videos.json
